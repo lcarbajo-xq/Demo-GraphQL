@@ -1,15 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
-const schema = require('./src/schemas/schema');
+const schema = require('./src/schemas');
+
+require('./db/setup')
 
 const app = express();
 
 app.use('/graphql', 
         bodyParser.json(), 
-        graphqlExpress(
-            { schema })
-)
+        graphqlExpress({
+            schema ,
+            formatError: (error) => {
+                return {
+                    name: error.name,
+                    code: 'E01',
+                    message: error.message
+                }
+            }
+        })
+    )
 
 app.use(
     '/graphiql',
